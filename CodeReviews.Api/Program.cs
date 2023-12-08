@@ -1,9 +1,12 @@
 using CodeReviews.Api.CodeReviews;
 using CodeReviews.Api.CodeReviews.CreatingPullRequest;
+using JasperFx.Core;
 using Microsoft.EntityFrameworkCore;
 using Oakton.Resources;
+using System.Net.Sockets;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
+using Wolverine.ErrorHandling;
 using Wolverine.Http;
 using Wolverine.SqlServer;
 
@@ -13,7 +16,7 @@ builder.Host.UseWolverine(opts =>
 {
     // Setting up Sql Server-backed message storage
     // This requires a reference to Wolverine.SqlServer
-    opts.PersistMessagesWithSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;");
+    opts.PersistMessagesWithSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;", "wolverine");
 
     // Set up Entity Framework Core as the support
     // for Wolverine's transactional middleware
@@ -28,6 +31,11 @@ builder.Host.UseWolverine(opts =>
     opts.Policies.ForMessagesOfType<CreatePullRequestRequest>()
         .AddMiddleware(typeof(CodeReviewDoNothingMiddleware))
         .AddMiddleware(typeof(PullRequestLookupMiddleware));
+
+    opts.Policies.OnException<CodeReviewException>()
+        .RetryOnce()
+        .Then.ScheduleRetry(5.Seconds())
+        .Then.Discard();
 });
 
 builder.Services.AddResourceSetupOnStartup();
@@ -37,7 +45,7 @@ builder.Services
     .AddSwaggerGen();
 
 builder.Services.AddDbContextWithWolverineIntegration<CodeReviewDbContext>(
-    x => x.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;"));
+    x => x.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;"), "wolverine");
 
 var app = builder.Build();
 

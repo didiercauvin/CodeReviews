@@ -4,6 +4,36 @@ using Wolverine;
 
 namespace CodeReviews.Api.CodeReviews;
 
+public class CodeReviewException : Exception
+{
+    public CodeReviewException() : base()
+    {
+    }
+
+    public CodeReviewException(string? message) : base(message)
+    {
+    }
+
+    public CodeReviewException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
+}
+
+public class CodeReviewForbiddenWordException : Exception
+{
+    public CodeReviewForbiddenWordException() : base()
+    {
+    }
+
+    public CodeReviewForbiddenWordException(string? message) : base(message)
+    {
+    }
+
+    public CodeReviewForbiddenWordException(string? message, Exception? innerException) : base(message, innerException)
+    {
+    }
+}
+
 public static class CodeReviewDoNothingMiddleware
 {
     public static Task<HandlerContinuation> LoadAsync(CreatePullRequestRequest request, CancellationToken cancellationToken)
