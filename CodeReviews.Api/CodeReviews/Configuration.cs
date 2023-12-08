@@ -7,14 +7,8 @@ namespace CodeReviews.Api.CodeReviews;
 
 public class CodeReviewDbContext : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public CodeReviewDbContext(DbContextOptions<CodeReviewDbContext> options) : base(options)
     {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;");
-        }
-
-        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

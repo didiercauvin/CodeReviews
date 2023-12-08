@@ -1,12 +1,30 @@
 using CodeReviews.Api.CodeReviews;
 using CodeReviews.Api.CodeReviews.CreatingPullRequest;
+using Microsoft.EntityFrameworkCore;
 using Oakton.Resources;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 using Wolverine.Http;
+using Wolverine.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseWolverine();
+builder.Host.UseWolverine(opts =>
+{
+    // Setting up Sql Server-backed message storage
+    // This requires a reference to Wolverine.SqlServer
+    opts.PersistMessagesWithSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;", "wolverine");
+
+    // Set up Entity Framework Core as the support
+    // for Wolverine's transactional middleware
+    opts.UseEntityFrameworkCoreTransactions();
+
+    // Enrolling all local queues into the
+    // durable inbox/outbox processing
+    opts.Policies.UseDurableLocalQueues();
+
+    opts.Policies.AutoApplyTransactions();
+});
 
 builder.Services.AddResourceSetupOnStartup();
 
@@ -14,7 +32,8 @@ builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen();
 
-builder.Services.AddDbContext<CodeReviewDbContext>();
+builder.Services.AddDbContextWithWolverineIntegration<CodeReviewDbContext>(
+    x => x.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;"), "wolverine");
 
 var app = builder.Build();
 

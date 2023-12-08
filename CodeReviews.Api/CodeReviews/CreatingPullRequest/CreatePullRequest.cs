@@ -1,5 +1,6 @@
 ﻿using CodeReviews.Api.Core;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 using Wolverine.Http;
 
 namespace CodeReviews.Api.CodeReviews.CreatingPullRequest;
@@ -11,8 +12,8 @@ public record PullRequestCreated(string Title);
 public static class CreatePullRequestHandler
 {
     [WolverinePost("/pullrequests")]
-    public static async Task Handle(CreatePullRequestRequest request, IMessageBus bus,
-        CodeReviewDbContext dbContext, CancellationToken ct)
+    public static async Task Handle(CreatePullRequestRequest request, IDbContextOutbox<CodeReviewDbContext> outbox,
+         CancellationToken ct)
     {
         var (title, files, reviewers) = request;
 
@@ -23,9 +24,11 @@ public static class CreatePullRequestHandler
             Reviews = reviewers.Select(r => new PullRequestReview { IdReviewer = r.IdReviewer }).ToList()
         };
 
-        await dbContext.AddAndSaveAsync(pullrequest, ct);
+        await outbox.DbContext.AddAsync(pullrequest, ct);
 
-        await bus.PublishAsync(new PullRequestCreated(title));
+        await outbox.PublishAsync(new PullRequestCreated(title));
+
+        await outbox.SaveChangesAndFlushMessagesAsync();
     }
 }
 
