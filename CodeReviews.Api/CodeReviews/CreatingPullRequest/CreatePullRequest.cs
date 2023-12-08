@@ -5,9 +5,11 @@ namespace CodeReviews.Api.CodeReviews.CreatingPullRequest;
 
 public record CreatePullRequest(string Title, IEnumerable<CreatePullRequestFile> Files, IEnumerable<CreatePullRequestReviewers> Reviewers);
 
+public record PullRequestCreated(string Title);
+
 public static class CreatePullRequestHandler
 {
-    public static async Task Handle(CreatePullRequest command, CodeReviewDbContext dbContext, CancellationToken ct)
+    public static async Task<PullRequestCreated> Handle(CreatePullRequest command, CodeReviewDbContext dbContext, CancellationToken ct)
     {
         var pullrequest = new PullRequest()
         {
@@ -18,6 +20,16 @@ public static class CreatePullRequestHandler
 
         await dbContext.AddAsync(pullrequest, ct);
         await dbContext.SaveChangesAsync(ct);
+
+        return new PullRequestCreated(command.Title);
+    }
+}
+
+public static class PullRequestCreatedHandler
+{
+    public static void Handle(PullRequestCreated @event)
+    {
+        Console.WriteLine($"la pull request '{@event.Title}' a été créée");
     }
 }
 
