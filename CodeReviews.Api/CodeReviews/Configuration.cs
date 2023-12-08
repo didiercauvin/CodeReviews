@@ -5,14 +5,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CodeReviews.Api.CodeReviews;
 
-public static class PullRequestEndpoints
-{
-    public static IEndpointRouteBuilder UsePullRequestEndpoints(this IEndpointRouteBuilder endpoints)
-        => endpoints
-            .UseCreatePullRequestEndpoint()
-            .UseGetPullRequestsEndpoint();
-}
-
 public class CodeReviewDbContext : DbContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

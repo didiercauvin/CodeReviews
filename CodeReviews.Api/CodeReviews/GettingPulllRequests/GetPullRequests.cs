@@ -1,18 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Wolverine.Http;
 
 namespace CodeReviews.Api.CodeReviews.GettingPulllRequests;
 
 public static class GetPullRequestsEndpoint
 {
-    public static IEndpointRouteBuilder UseGetPullRequestsEndpoint(this IEndpointRouteBuilder endpoints)
+    [WolverineGet("/pullrequests")]
+    public static PullRequest[] GetAll(CodeReviewDbContext dbContext)
     {
-        endpoints.MapGet("/pullrequests", ([FromServices] CodeReviewDbContext dbContext) =>
-        {
-            var pullrequests = dbContext.PullRequests.ToList();
-
-            return pullrequests;
-        });
-
-        return endpoints;
+        return dbContext.PullRequests.ToArray();
     }
 }

@@ -2,6 +2,7 @@ using CodeReviews.Api.CodeReviews;
 using CodeReviews.Api.CodeReviews.CreatingPullRequest;
 using Oakton.Resources;
 using Wolverine;
+using Wolverine.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +24,9 @@ if (app.Environment.IsDevelopment())
         .UseSwaggerUI();
 }
 
-app.UseHttpsRedirection()
-    .UseRouting()
-    .UseEndpoints(endpoints => endpoints.UsePullRequestEndpoints());
+app.UseHttpsRedirection();
+
+app.MapWolverineEndpoints();
 
 var summaries = new[]
 {
