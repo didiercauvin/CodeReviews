@@ -13,7 +13,7 @@ builder.Host.UseWolverine(opts =>
 {
     // Setting up Sql Server-backed message storage
     // This requires a reference to Wolverine.SqlServer
-    opts.PersistMessagesWithSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;", "wolverine");
+    opts.PersistMessagesWithSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;");
 
     // Set up Entity Framework Core as the support
     // for Wolverine's transactional middleware
@@ -24,6 +24,10 @@ builder.Host.UseWolverine(opts =>
     opts.Policies.UseDurableLocalQueues();
 
     opts.Policies.AutoApplyTransactions();
+
+    opts.Policies.ForMessagesOfType<CreatePullRequestRequest>()
+        .AddMiddleware(typeof(CodeReviewDoNothingMiddleware))
+        .AddMiddleware(typeof(PullRequestLookupMiddleware));
 });
 
 builder.Services.AddResourceSetupOnStartup();
@@ -33,7 +37,7 @@ builder.Services
     .AddSwaggerGen();
 
 builder.Services.AddDbContextWithWolverineIntegration<CodeReviewDbContext>(
-    x => x.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;"), "wolverine");
+    x => x.UseSqlServer("Server=localhost;Initial Catalog=demo-code-reviews;Integrated Security=true; TrustServerCertificate=True;"));
 
 var app = builder.Build();
 

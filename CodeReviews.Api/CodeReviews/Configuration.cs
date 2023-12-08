@@ -1,9 +1,27 @@
-﻿using CodeReviews.Api.CodeReviews.CreatingPullRequest;
-using CodeReviews.Api.CodeReviews.GettingPulllRequests;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Wolverine;
 
 namespace CodeReviews.Api.CodeReviews;
+
+public static class CodeReviewDoNothingMiddleware
+{
+    public static Task<HandlerContinuation> LoadAsync(CreatePullRequestRequest request, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(HandlerContinuation.Continue);
+    }
+}
+
+public static class PullRequestLookupMiddleware
+{
+    public static async Task<(HandlerContinuation, PullRequest?)> LoadAsync(CreatePullRequestRequest request, CodeReviewDbContext context,
+        CancellationToken cancellationToken)
+    {
+        var pullrequest = await context.PullRequests.SingleOrDefaultAsync(pr => pr.Title == request.Title, cancellationToken);
+
+        return (pullrequest is null ? HandlerContinuation.Continue : HandlerContinuation.Stop, pullrequest);
+    }
+}
 
 public class CodeReviewDbContext : DbContext
 {
