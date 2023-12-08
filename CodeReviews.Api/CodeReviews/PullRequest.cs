@@ -5,8 +5,8 @@ public class PullRequest
 
     public int Id { get; set; }
     public string Status { get; set; } = "Pending";
-    public List<PullRequestFile> Files { get; set; }
-    public List<PullRequestReview> Reviews { get; set; }
+    public ICollection<PullRequestFile> Files { get; set; } = new List<PullRequestFile>();
+    public ICollection<PullRequestReview> Reviews { get; set; } = new List<PullRequestReview>();
 }
 
 public class PullRequestReview
@@ -15,7 +15,7 @@ public class PullRequestReview
     public int IdPullRequest { get; set; }
     private PullRequest PullRequest { get; set; }
     public int IdReviewer { get; set; }
-    public string Status { get; set; } = "OK";
+    public string Status { get; set; } = "Pending";
 }
 
 public class PullRequestFile
@@ -24,7 +24,7 @@ public class PullRequestFile
     public int IdPullRequest { get; set; }
     private PullRequest PullRequest { get; set; }
     public string Filename { get; set; }
-    public List<PullRequestFileReview> Reviews { get; set; } = new();
+    public ICollection<PullRequestFileReview> Reviews { get; set; } = new List<PullRequestFileReview>();
 }
 
 public class PullRequestFileReview

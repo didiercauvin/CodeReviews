@@ -1,5 +1,6 @@
 using CodeReviews.Api.CodeReviews;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Wolverine;
 
@@ -7,38 +8,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseWolverine();
 
-// Add services to the container.
-
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen();
 
 builder.Services.AddDbContext<CodeReviewDbContext>();
 
 var app = builder.Build();
-// Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
-
-
-
-
-app.MapGet("/pullrequests", ([FromServices] CodeReviewDbContext dbContext) =>
+if (app.Environment.IsDevelopment())
 {
-    var pullrequests = dbContext.PullRequests.ToList();
+    app.UseSwagger()
+        .UseSwaggerUI();
+}
 
-    return pullrequests;
-});
-
-app.MapPost("/pullrequests", async (CreatePullRequestRequest body, [FromServices] CodeReviewDbContext dbContext, CancellationToken ct) =>
-{
-    var pullrequest = new PullRequest()
-    {
-        Files = body.files.Select(f => new  PullRequestFile { Filename = f.Filename }).ToList(),
-        Reviews = body.reviewers.Select(r => new PullRequestReview { IdReviewer = r.IdReviewer }).ToList()
-    };
-
-    await dbContext.AddAsync(pullrequest);
-    await dbContext.SaveChangesAsync();
-});
-
+app.UseHttpsRedirection()
+    .UseRouting()
+    .UseEndpoints(endpoints => endpoints.UsePullRequestEndpoints());
 
 var summaries = new[]
 {

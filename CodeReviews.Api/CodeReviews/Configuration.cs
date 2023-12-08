@@ -1,8 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CodeReviews.Api.CodeReviews.CreatingPullRequest;
+using CodeReviews.Api.CodeReviews.GettingPulllRequests;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Spectre.Console;
 
 namespace CodeReviews.Api.CodeReviews;
+
+public static class PullRequestEndpoints
+{
+    public static IEndpointRouteBuilder UsePullRequestEndpoints(this IEndpointRouteBuilder endpoints)
+        => endpoints
+            .UseCreatePullRequestEndpoint()
+            .UseGetPullRequestsEndpoint();
+}
 
 public class CodeReviewDbContext : DbContext
 {
