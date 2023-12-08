@@ -1,12 +1,13 @@
 using CodeReviews.Api.CodeReviews;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
+using CodeReviews.Api.CodeReviews.CreatingPullRequest;
+using Oakton.Resources;
 using Wolverine;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseWolverine();
+
+builder.Services.AddResourceSetupOnStartup();
 
 builder.Services
     .AddEndpointsApiExplorer()
@@ -52,6 +53,6 @@ internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary
 }
 
 
-public record CreatePullRequestRequest(IEnumerable<CreatePullRequestFileRequest> files, IEnumerable<CreatePullRequestReviewersRequest> reviewers);
-public record CreatePullRequestFileRequest(string Filename);
-public record CreatePullRequestReviewersRequest(int IdReviewer);
+public record CreatePullRequestRequest(string Title, IEnumerable<CreatePullRequestFile> Files, IEnumerable<CreatePullRequestReviewers> Reviewers);
+public record CreatePullRequestFile(string Filename);
+public record CreatePullRequestReviewers(int IdReviewer);

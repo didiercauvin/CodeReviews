@@ -4,6 +4,7 @@ public class PullRequest
 {
 
     public int Id { get; set; }
+    public string Title { get; set; }
     public string Status { get; set; } = "Pending";
     public ICollection<PullRequestFile> Files { get; set; } = new List<PullRequestFile>();
     public ICollection<PullRequestReview> Reviews { get; set; } = new List<PullRequestReview>();
