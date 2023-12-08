@@ -1,6 +1,5 @@
 using CodeReviews.Api.CodeReviews;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Wolverine;
 
