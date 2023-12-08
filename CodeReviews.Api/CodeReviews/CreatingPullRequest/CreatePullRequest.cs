@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Wolverine;
+﻿using CodeReviews.Api.Core;
 using Wolverine.Http;
 
 namespace CodeReviews.Api.CodeReviews.CreatingPullRequest;
@@ -20,7 +19,6 @@ public static class CreatePullRequestHandler
             Reviews = reviewers.Select(r => new PullRequestReview { IdReviewer = r.IdReviewer }).ToList()
         };
 
-        await dbContext.AddAsync(pullrequest, ct);
-        await dbContext.SaveChangesAsync(ct);
+        await dbContext.AddAndSaveAsync(pullrequest, ct);
     }
 }
